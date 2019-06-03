@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0cc56692-506c-4f47-961f-4580d5a34275" name="Default Changelist" comment="" />
+    <list default="true" id="0cc56692-506c-4f47-961f-4580d5a34275" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CFIARegulations.py" beforeDir="false" afterPath="$PROJECT_DIR$/CFIARegulations.py" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -10,11 +13,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/CFIARegulations.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="295">
-              <caret line="66" column="74" lean-forward="true" selection-start-line="66" selection-start-column="74" selection-end-line="66" selection-end-column="74" />
+            <state relative-caret-position="286">
+              <caret line="67" lean-forward="true" selection-start-line="67" selection-end-line="67" />
               <folding>
                 <element signature="e#56#85#0" expanded="true" />
               </folding>
@@ -22,11 +25,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pandasTest.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="420">
-              <caret line="21" lean-forward="true" selection-start-line="21" selection-end-line="21" />
+            <state relative-caret-position="140">
+              <caret line="7" column="18" selection-start-line="7" selection-start-column="18" selection-end-line="7" selection-end-column="18" />
               <folding>
                 <element signature="e#56#85#0" expanded="true" />
               </folding>
@@ -57,8 +60,8 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/CFIARegulations.py" />
         <option value="$PROJECT_DIR$/pandasTest.py" />
+        <option value="$PROJECT_DIR$/CFIARegulations.py" />
       </list>
     </option>
   </component>
@@ -91,7 +94,7 @@
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="C:/Program Files/R" />
-    <property name="settings.editor.selected.configurable" value="vcs.Git" />
+    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -200,10 +203,10 @@
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32936507" />
-      <window_info anchor="bottom" id="Version Control" order="7" sideWeight="0.49886793" visible="true" weight="0.07010582" />
-      <window_info anchor="bottom" id="Terminal" order="8" sideWeight="0.499226" weight="0.30555555" />
-      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.5011321" side_tool="true" visible="true" weight="0.07010582" />
-      <window_info anchor="bottom" id="Python Console" order="10" weight="0.32936507" />
+      <window_info anchor="bottom" id="Version Control" order="7" sideWeight="0.49811321" visible="true" weight="0.33333334" />
+      <window_info anchor="bottom" id="Terminal" order="8" sideWeight="0.5826415" weight="0.505291" />
+      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.5018868" side_tool="true" visible="true" weight="0.33333334" />
+      <window_info anchor="bottom" id="Python Console" order="10" sideWeight="0.49962264" weight="0.32936507" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -217,20 +220,20 @@
     <option name="LAST_COMMIT_MESSAGE" value="Base working files for webScraper" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/pandasTest.py">
+    <entry file="file://$PROJECT_DIR$/CFIARegulations.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
-          <caret line="21" lean-forward="true" selection-start-line="21" selection-end-line="21" />
+        <state relative-caret-position="286">
+          <caret line="67" lean-forward="true" selection-start-line="67" selection-end-line="67" />
           <folding>
             <element signature="e#56#85#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/CFIARegulations.py">
+    <entry file="file://$PROJECT_DIR$/pandasTest.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="295">
-          <caret line="66" column="74" lean-forward="true" selection-start-line="66" selection-start-column="74" selection-end-line="66" selection-end-column="74" />
+        <state relative-caret-position="140">
+          <caret line="7" column="18" selection-start-line="7" selection-start-column="18" selection-end-line="7" selection-end-column="18" />
           <folding>
             <element signature="e#56#85#0" expanded="true" />
           </folding>

@@ -65,6 +65,7 @@ for item in regContents:
         else:
             headingText = hSpan[1].get_text()
         hTemp = pd.DataFrame([[headingType, h5, headingText, parentCode]])
+
         headingData = headingData.append(hTemp, ignore_index=True)
 
 #Creates a table of definitions
