@@ -69,11 +69,11 @@ for item in regContents:
         headingData = headingData.append(hTemp, ignore_index=True)
 
 #Creates a table of definitions
-definitions = soup.find_all('p', class_='Definition')
+#definitions = soup.find_all('p', class_='Definition')
 
 #Renames columns
 headingData = headingData.rename(index=str, columns={0:"headingType", 1:'headingCode', 2:'headingText', 3:'parentCode'})
 
-#export_csv = headingData.to_csv (r'C:\Users\Dragonfly\Documents\export_dataframe.csv', index = None, header=True)
+export_csv = headingData.to_csv (r'C:\Users\Dragonfly\Documents\export_dataframe.csv', index = None, header=True)
 
 print(headingData)
