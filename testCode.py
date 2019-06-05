@@ -23,9 +23,19 @@ for item in regPart.find_all(recursive=False):
     if item.name in headingDict:
         varList = udf.proc_heading(item, headingDict[item.name])
 
-    elif item.get('class')[0] == 'MarginalNote':
-        print(item.find(text=True, recursive=False))
+    # processes classes
+    elif len(item.attrs) > 0:
+        #Marginal notes, these exist
+        if item.get('class')[0] == 'MarginalNote':
+            varList = udf.proc_marginalnote(item, 5)
 
+        #Retrieves sections
+        elif item.get('class')[0] == 'Section':
+            varList = udf.proc_section(item, 6)
+
+        #Provision lists (contains sections and subsections)
+        elif item.get('class')[0] == 'ProvisionList':
+            print()
 
 # Create a unique list of headings, this is what would be found in the table of contents in the sheet.
 # for item in regContents:
