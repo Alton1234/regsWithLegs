@@ -130,7 +130,6 @@ def proc_provisions(tag):
         for items in lists.find_all(recursive=False):
             # S2: There should only be <p> and <ul> at this point, in the case of <p> scrape contents
             if items.name == 'p':
-                # Subsection processing
                 if items.get('class')[0] == 'Subsection':
                     outputlist.extend(proc_subsection(items, 7))
                 elif items.get('class')[0] == 'MarginalNote':
@@ -143,7 +142,6 @@ def proc_provisions(tag):
                     outputlist.append(proc_paragraph(items))
 
             if items.name == 'ul':
-                #outputlist.append("recursive")
                 outputlist.extend(proc_provisions(items))
 
     del outputlist[0]  # Removes first faux entry

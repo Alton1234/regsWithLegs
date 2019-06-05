@@ -72,7 +72,6 @@ for item in regPart.find_all(recursive=False):
             tempList = udf.proc_provisions(item)
             print(*tempList, sep = "\n")
 
-
 #### FOR FUTURE USE
 # # Append data frame with new row
 # tocFrame = tocFrame.append([[headingLevel,
