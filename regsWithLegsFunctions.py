@@ -1,9 +1,9 @@
 def clean_text(rawtext):
     text = (rawtext.
             replace('\xa0', ' ').
-            replace('\xe2\x80\x9c', ' ').
-            replace('\xe2\x80\x9d', '“').
-            replace('\xe2\x80\x94', '”'))
+            replace('\xe2\x80\x9c', '“').
+            replace('\xe2\x80\x9d', '”').
+            replace('\xe2\x80\x94', '-'))
     return text
 
 def proc_heading(tag, level):
@@ -15,7 +15,7 @@ def proc_heading(tag, level):
     headingtext = list(tag)[0].get_text()  # Contains the part number etc
 
     if len(list(tag)) > 1:
-        headingdescription = list(tag)[1].get_text()  # Contains the description, if any
+        headingdescription = clean_text(list(tag)[1].get_text())  # Contains the description, if any
     else:
         headingdescription = ''
 
@@ -46,7 +46,7 @@ def proc_section(tag, level):
     headinglevel = level  # Retrieves heading level IE: 1 = part
     headingtype = tag.get('class')[0]
     headingtext = subcode.get_text() # Contains the part number etc
-    headingdescription = tempitem.get_text()  # Marginal notes do not have associated descriptions
+    headingdescription = clean_text(tempitem.get_text())  # Marginal notes do not have associated descriptions
     headingid = subcode.get('id')
 
     return [headinglevel, headingtype, headingtext, headingdescription, headingid]
@@ -81,9 +81,9 @@ def proc_subsection(tag, subLevel):
         subTag = subTag.parent  # Step up to parent
         headingdescription = subTag.find_all(text=True, recursive=False)
         if len(headingdescription) > 1:
-            headingdescription = headingdescription[1]
+            headingdescription = clean_text(headingdescription[1])
         else:
-            headingdescription = headingdescription[0]
+            headingdescription = clean_text(headingdescription[0])
 
         # Generates entry to add too list
         outputlist.append([headinglevel, headingtype, headingtext, headingdescription, headingid])
@@ -115,9 +115,9 @@ def proc_paragraph(tag):
 
     headingdescription = subTag.find_all(text=True, recursive=False)
     if len(headingdescription) > 1:
-        headingdescription = headingdescription[1]
+        headingdescription = clean_text(headingdescription[1])
     else:
-        headingdescription = headingdescription[0]
+        headingdescription = clean_text(headingdescription[0])
 
     return [headinglevel, headingtype, headingtext, headingdescription, headingid]
 
