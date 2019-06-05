@@ -1,6 +1,6 @@
 def clean_text(rawtext):
     text = (rawtext.
-            replace('\xa0', ' ').
+            replace('\xa0', '').
             replace('\xe2\x80\x9c', '“').
             replace('\xe2\x80\x9d', '”').
             replace('\xe2\x80\x94', '-'))
@@ -22,7 +22,6 @@ def proc_heading(tag, level):
     headingid = tag.get('id')
 
     return [headinglevel, headingtype, headingtext, headingdescription, headingid]
-
 
 def proc_marginalnote(tag, level):
     """Processes marginal notes and returns an array that contains
