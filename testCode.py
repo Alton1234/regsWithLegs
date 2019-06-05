@@ -35,10 +35,11 @@ for item in regPart.find_all(recursive=False):
 
         # Provision lists (contains sections and subsections)
         elif item.get('class')[0] == 'ProvisionList':
-            for subItem in item.find_all(class_='Subsection'):
-                tempList = udf.proc_subsection(subItem, 7)
+            for subItem in item.find_all(class_='Clause'):
+                tempList = udf.proc_paragraph(subItem)
                 for thing in tempList:
                     print(thing)
+
 # Create a unique list of headings, this is what would be found in the table of contents in the sheet.
 # for item in regContents:
 #     print('y')

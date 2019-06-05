@@ -65,14 +65,17 @@ def proc_subsection(tag, subLevel):
         outputlist.append([[headinglevel, headingtype, headingtext, headingdescription, headingid]])
 
     if len(tag.find_all(class_='lawLabel')) > 0:
-        #subTag = tag.find(class_="lawLabel")
+        subTag = tag.find(class_="lawLabel")
         headinglevel = subLevel  # Subsection, this may need to change
         headingtype = 'lawLabel'
-        headingtext = tag.get_text()
-        headingid = tag.get('id')
-        tag.parent # Step up to parent
-        headingdescription = tag.find(text=True, recursive=False)
-
+        headingtext = subTag.get_text()
+        headingid = subTag.get('id')
+        subTag = subTag.parent  # Step up to parent
+        headingdescription = subTag.find_all(text=True, recursive=False)
+        if len(headingdescription) > 1:
+            headingdescription = headingdescription[1]
+        else:
+            headingdescription = headingdescription[0]
 
         # Generates entry to add too list
         outputlist.append([[headinglevel, headingtype, headingtext, headingdescription, headingid]])
@@ -80,9 +83,41 @@ def proc_subsection(tag, subLevel):
     del outputlist[0]  # Removes first faux entry
 
     return outputlist
+
+def proc_paragraph(tag):
+    """Processes tags with class paragraph, sub paragraphs, and Clauses"""
+
+    #Assigns level based on class
+    classlevel = {
+        'Paragraph': 7,
+        'Subparagraph': 8,
+        'Clause': 9
+    }
+    sublevel = classlevel[tag.get('class')[0]]
+
+    #S1: retrieve lawLable object
+    subTag = tag.find(class_="lawLabel")
+
+    headinglevel = sublevel
+    headingtype = 'lawLabel'
+    headingtext = subTag.get_text()  # Contains the part number etc
+    headingid = subTag.get('id')
+
+    subTag = subTag.parent
+
+    headingdescription = subTag.find_all(text=True, recursive=False)
+    if len(headingdescription) > 1:
+        headingdescription = headingdescription[1]
+    else:
+        headingdescription = headingdescription[0]
+
+    return [[headinglevel, headingtype, headingtext, headingdescription, headingid]]
+
 def proc_provisions(tag):
     """Processes provisions, this is a recursive function as the depth of these
     lists are otherwise unknown"""
+
+    outputlist = ['start of list']  # Initiate list
 
     # S1: Check for <li> tag, if present retrieve children
     if tag.name == 'li':
@@ -94,5 +129,16 @@ def proc_provisions(tag):
         if tag.name == 'p':
             #Subsection processing
             if tag.get('class')[0] == 'Subsection':
-                print()
+                outputlist.append(proc_subsection(tag, 7))
+            elif tag.get('class')[0] == 'Paragraph':
+                outputlist.append(proc_subsection(tag))
+            elif tag.get('class')[0] == 'Subparagraph':
+                outputlist.append(proc_subsection(tag))
+            elif tag.get('class')[0] == 'Clause':
+                outputlist.append(proc_subsection(tag))
 
+    if tag.name == 'ul':
+        outputlist.append(proc_provisions(tag))
+
+    del outputlist[0]  # Removes first faux entry
+    return outputlist
