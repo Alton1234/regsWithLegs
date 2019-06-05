@@ -1,79 +1,89 @@
-#Notes
-# In the regulations, h2 are the main headings
+# What we know
+# <h1>: Title of the regulation
+# <h2>: Parts and Schedules
+# <h3>: Divisions
+# <h4>: Subdivision
+# <h5>: Category or sub-sub division, these don't seem to have numbers
+# <class="sectionLabel">: Sections, these are in the format [#]
+# <class="lawlabel">: Sub-sections, sub-sub sections etc. In the format (#) -> (Char) -> (roman numeral)
+# To scrape this page into a data set I am going to create two data sets.
+#   1. Make an indexed list of all headings
+#   2. Make a list of sections -> sub.... sections with a key field indicating their hierarchy IE:
+#       Title | Part | Division | Subdivision | Category |  Section | Sub-section | SS Section | SSS Section
+#       *This will make scraping easier to use this format, however, the final data set itself may be adjusted into
+#        a more use-able format.
+
+# --- provision lists <ul> ---------
+# 1. Direct descendants will always be one or more lists <li> without a class
+# 2. <li> descendants will either be <p> or another <ul> for most cases, <div> and <figure> show-up in low frequency
+#   a. if descendant = <p> then they will have one of the following classes
+#       Subsection
+#       MarginalNote
+#       Paragraph
+#       Sub paragraph
+#       Clause
+#       caption *Will probably exclude the classes below this
+#       Footnote
+#       Paragraph
 #
+#   b. if descendant = <ul>, recursively process
+
 from bs4 import BeautifulSoup
-import numpy as np
+import regsWithLegsFunctions as udf
 import pandas as pd
 import requests
-page = requests.get("https://laws-lois.justice.gc.ca/eng/regulations/SOR-2018-108/FullText.html")
-print(page.content)
 
-soup = BeautifulSoup(page.content, 'html.parser')
-regContents = soup.find(id= 'docCont').find_all()
+# Stores a list heading tag types to take into consideration adn the corresponding level
+headingDict = {
+    "h2": 1,
+    "h3": 2,
+    "h4": 3,
+    "h5": 4}
 
-# Initial heading: the title of the regulations
-h1 = soup.find('h1').get_text()
+page = requests.get("https://laws-lois.justice.gc.ca/eng/regulations/SOR-2018-108/FullText.html")  # Retrieve regulations html document
+soup = BeautifulSoup(page.content, 'html.parser')  # Creates beautiful soup objects
 
-headingData = pd.DataFrame([['H1', h1, '', '']])
+# Initializes a pandas data frame for heading data
+titleOfAct = soup.find(class_="Title-of-Act").get_text()
+subText = soup.find(class_='ChapterNumber').get_text()
+tocFrame = pd.DataFrame([[0, "Title of Regulation", titleOfAct, subText, '']])  # Creates first entry
 
-# Creates a data frame that houses the basic table of contents
-# columns=['headingType', 'headingCode', 'headingText', 'parentCode']
-for item in regContents:
-    if item.name == 'h2':
-        hSpan = list(item.find_all('span'))
-        headingType = "H2"
-        h2 = hSpan[0].get_text()
-        parentCode = h1
-        if len(hSpan) == 1:
-            headingText = ''
-        else:
-            headingText = hSpan[1].get_text()
+# Drill down to the relevant part of the HTML code
+mainBody = soup.find(id='docCont').find('div')  # returns all elements from the page
+subPart = mainBody.find_all('section', recursive=False)
 
-        hTemp = pd.DataFrame([[headingType, h2, headingText, parentCode]])
-        headingData = headingData.append(hTemp, ignore_index=True)
+intro = subPart[0]  # Stores introduction text
+regPart = subPart[1]  # Stores regulation text
 
-    elif item.name == 'h3':
-        hSpan = list(item.find_all('span'))
-        headingType = "H3"
-        h3 = hSpan[0].get_text()
-        parentCode = h2
-        if len(hSpan) == 1:
-            headingText = ''
-        else:
-            headingText = hSpan[1].get_text()
-        hTemp = pd.DataFrame([[headingType, h3, headingText, parentCode]])
-        headingData = headingData.append(hTemp, ignore_index=True)
+for item in regPart.find_all(recursive=False):
+    # Checks if tag is a heading
+    if item.name in headingDict:
+        varList = udf.proc_heading(item, headingDict[item.name])
+    # processes classes
+    elif len(item.attrs) > 0:
+        # Marginal notes, these exist
+        if item.get('class')[0] == 'MarginalNote':
+            varList = udf.proc_marginalnote(item, 5)
+        # Retrieves sections
+        elif item.get('class')[0] == 'Section':
+            varList = udf.proc_section(item, 6)
+        # Provision lists (contains sections and subsections)
+        elif item.get('class')[0] == 'ProvisionList':
+            tempList = udf.proc_provisions(item)
+            print(*tempList, sep = "\n")
 
-    elif item.name == 'h4':
-        hSpan = list(item.find_all('span'))
-        headingType = "H4"
-        h4 = hSpan[0].get_text()
-        parentCode = h3
-        if len(hSpan) == 1:
-            headingText = ''
-        else:
-            headingText = hSpan[1].get_text()
-        hTemp = pd.DataFrame([[headingType, h4, headingText, parentCode]])
-        headingData = headingData.append(hTemp, ignore_index=True)
 
-    elif item.name == 'h5':
-        headingType = "H5"
-        h5 = item.get_text()
-        parentCode = h4
-        if len(hSpan) == 1:
-            headingText = ''
-        else:
-            headingText = hSpan[1].get_text()
-        hTemp = pd.DataFrame([[headingType, h5, headingText, parentCode]])
-
-        headingData = headingData.append(hTemp, ignore_index=True)
-
-#Creates a table of definitions
-#definitions = soup.find_all('p', class_='Definition')
-
-#Renames columns
-headingData = headingData.rename(index=str, columns={0:"headingType", 1:'headingCode', 2:'headingText', 3:'parentCode'})
-
-export_csv = headingData.to_csv (r'C:\Users\Dragonfly\Documents\export_dataframe.csv', index = None, header=True)
-
-print(headingData)
+#### FOR FUTURE USE
+# # Append data frame with new row
+# tocFrame = tocFrame.append([[headingLevel,
+#                              headingType,
+#                              headingText,
+#                              headingDescription,
+#                              headingID]],
+#                            ignore_index=True)
+# # Renames column names for readability
+# tocFrame = tocFrame.rename(index=str, columns={0: "headingLevel",
+#                                                1: "headingType",
+#                                                2: 'headingText',
+#                                                3: 'headingDescription',
+#                                                4: 'headingID'})
