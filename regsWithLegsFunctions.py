@@ -1,3 +1,11 @@
+def clean_text(rawtext):
+    text = (rawtext.
+            replace('\xa0', ' ').
+            replace('\xe2\x80\x9c', ' ').
+            replace('\xe2\x80\x9d', '“').
+            replace('\xe2\x80\x94', '”'))
+    return text
+
 def proc_heading(tag, level):
     """Processes headings and returns an array that contains
     the heading level, heading type, heading name, heading text"""
@@ -13,7 +21,7 @@ def proc_heading(tag, level):
 
     headingid = tag.get('id')
 
-    return [[headinglevel, headingtype, headingtext, headingdescription, headingid]]
+    return [headinglevel, headingtype, headingtext, headingdescription, headingid]
 
 
 def proc_marginalnote(tag, level):
@@ -26,7 +34,7 @@ def proc_marginalnote(tag, level):
     headingdescription = ''  # Marginal notes do not have associated descriptions
     headingid = tag.get('id')
 
-    return [[headinglevel, headingtype, headingtext, headingdescription, headingid]]
+    return [headinglevel, headingtype, headingtext, headingdescription, headingid]
 
 def proc_section(tag, level):
     """Processes section and returns an array that contains
@@ -41,7 +49,7 @@ def proc_section(tag, level):
     headingdescription = tempitem.get_text()  # Marginal notes do not have associated descriptions
     headingid = subcode.get('id')
 
-    return [[headinglevel, headingtype, headingtext, headingdescription, headingid]]
+    return [headinglevel, headingtype, headingtext, headingdescription, headingid]
 
 def proc_subsection(tag, subLevel):
     """<p class='subSection'> have one of the following structures:
@@ -62,7 +70,7 @@ def proc_subsection(tag, subLevel):
         headingid = sectiontag.get('id')
 
         # Generates entry to add too list
-        outputlist.append([[headinglevel, headingtype, headingtext, headingdescription, headingid]])
+        outputlist.append([headinglevel, headingtype, headingtext, headingdescription, headingid])
 
     if len(tag.find_all(class_='lawLabel')) > 0:
         subTag = tag.find(class_="lawLabel")
@@ -78,7 +86,7 @@ def proc_subsection(tag, subLevel):
             headingdescription = headingdescription[0]
 
         # Generates entry to add too list
-        outputlist.append([[headinglevel, headingtype, headingtext, headingdescription, headingid]])
+        outputlist.append([headinglevel, headingtype, headingtext, headingdescription, headingid])
 
     del outputlist[0]  # Removes first faux entry
 
@@ -111,34 +119,32 @@ def proc_paragraph(tag):
     else:
         headingdescription = headingdescription[0]
 
-    return [[headinglevel, headingtype, headingtext, headingdescription, headingid]]
+    return [headinglevel, headingtype, headingtext, headingdescription, headingid]
 
 def proc_provisions(tag):
     """Processes provisions, this is a recursive function as the depth of these
     lists are otherwise unknown"""
 
     outputlist = ['start of list']  # Initiate list
+    for lists in tag.find_all(recursive=False):
+        for items in lists.find_all(recursive=False):
+            # S2: There should only be <p> and <ul> at this point, in the case of <p> scrape contents
+            if items.name == 'p':
+                # Subsection processing
+                if items.get('class')[0] == 'Subsection':
+                    outputlist.extend(proc_subsection(items, 7))
+                elif items.get('class')[0] == 'MarginalNote':
+                    outputlist.append(proc_marginalnote(items, 5))
+                elif items.get('class')[0] == 'Paragraph':
+                    outputlist.append(proc_paragraph(items))
+                elif items.get('class')[0] == 'Subparagraph':
+                    outputlist.append(proc_paragraph(items))
+                elif items.get('class')[0] == 'Clause':
+                    outputlist.append(proc_paragraph(items))
 
-    # S1: Check for <li> tag, if present retrieve children
-    if tag.name == 'li':
-        tag = tag.find_all(recursive=False)
-
-    #Simplification step: skip multi-class tags, this will be refined after testing
-    if len(tag.get('class')) == 1:
-        # S2: There should only be <p> and <ul> at this point, in the case of <p> scrape contents based on class
-        if tag.name == 'p':
-            #Subsection processing
-            if tag.get('class')[0] == 'Subsection':
-                outputlist.append(proc_subsection(tag, 7))
-            elif tag.get('class')[0] == 'Paragraph':
-                outputlist.append(proc_subsection(tag))
-            elif tag.get('class')[0] == 'Subparagraph':
-                outputlist.append(proc_subsection(tag))
-            elif tag.get('class')[0] == 'Clause':
-                outputlist.append(proc_subsection(tag))
-
-    if tag.name == 'ul':
-        outputlist.append(proc_provisions(tag))
+            if items.name == 'ul':
+                #outputlist.append("recursive")
+                outputlist.extend(proc_provisions(items))
 
     del outputlist[0]  # Removes first faux entry
     return outputlist

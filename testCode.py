@@ -22,38 +22,15 @@ for item in regPart.find_all(recursive=False):
     # Checks if tag is a heading
     if item.name in headingDict:
         varList = udf.proc_heading(item, headingDict[item.name])
-
     # processes classes
     elif len(item.attrs) > 0:
         # Marginal notes, these exist
         if item.get('class')[0] == 'MarginalNote':
             varList = udf.proc_marginalnote(item, 5)
-
         # Retrieves sections
         elif item.get('class')[0] == 'Section':
             varList = udf.proc_section(item, 6)
-
         # Provision lists (contains sections and subsections)
         elif item.get('class')[0] == 'ProvisionList':
-            for subItem in item.find_all(class_='Clause'):
-                tempList = udf.proc_paragraph(subItem)
-                for thing in tempList:
-                    print(thing)
-
-# Create a unique list of headings, this is what would be found in the table of contents in the sheet.
-# for item in regContents:
-#     print('y')
-    # if 'class' in item.attrs:
-    #     if len(item.get('class')) != 0:
-    #         if item.get('class')[0] == 'MarginalNote':
-    #             headingLevel = 5  # The hierarchical level of the heading
-    #             headingType = "marginal Note"  # The categorical type of the heading
-    #             headingText = item.get_text()  # Contains the part number etc
-    #
-    #             print(str(headingLevel) + " " + headingType + " " + headingText)
-
-
-    # if len(list(item.get('class'))) != 0:
-    #     if list(item.get('class'))[1] == 'MarginalNote':
-    #         print(item.get_text())
-
+            tempList = udf.proc_provisions(item)
+            print(*tempList, sep = "\n")
