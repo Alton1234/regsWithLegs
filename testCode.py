@@ -13,7 +13,7 @@ headingDict = {
 
 soup = BeautifulSoup(page.content, 'html.parser')
 # Drill down to the relevant part of the HTML code
-mainBody = soup.find(id='docCont').find('div') # returns all elements from the page
+mainBody = soup.find(id='docCont').find('div')  # returns all elements from the page
 subPart = mainBody.find_all('section', recursive=False)
 intro = subPart[0]  # Stores introduction text
 regPart = subPart[1]  # Stores regulation text
@@ -25,18 +25,20 @@ for item in regPart.find_all(recursive=False):
 
     # processes classes
     elif len(item.attrs) > 0:
-        #Marginal notes, these exist
+        # Marginal notes, these exist
         if item.get('class')[0] == 'MarginalNote':
             varList = udf.proc_marginalnote(item, 5)
 
-        #Retrieves sections
+        # Retrieves sections
         elif item.get('class')[0] == 'Section':
             varList = udf.proc_section(item, 6)
 
-        #Provision lists (contains sections and subsections)
+        # Provision lists (contains sections and subsections)
         elif item.get('class')[0] == 'ProvisionList':
-            print()
-
+            for subItem in item.find_all(class_='Subsection'):
+                tempList = udf.proc_subsection(subItem, 7)
+                for thing in tempList:
+                    print(thing)
 # Create a unique list of headings, this is what would be found in the table of contents in the sheet.
 # for item in regContents:
 #     print('y')

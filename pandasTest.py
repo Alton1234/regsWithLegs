@@ -13,6 +13,22 @@
 #       *This will make scraping easier to use this format, however, the final data set itself may be adjusted into
 #        a more use-able format.
 
+# --- provision lists <ul> ---------
+# 1. Direct descendants will always be one or more lists <li> without a class
+# 2. <li> descendants will either be <p> or another <ul> for most cases, <div> and <figure> show-up in low frequency
+#   a. if descendant = <p> then they will have one of the following classes
+#       Subsection
+#       MarginalNote
+#       Paragraph
+#       Sub paragraph
+#       Clause
+#       caption *Will probably exclude the classes below this
+#       Footnote
+#       Paragraph
+#
+#   b. if descendant = <ul>, recursively process
+#
+# Lists will never have a class and will always contain
 from bs4 import BeautifulSoup
 import pandas as pd
 import requests
