@@ -90,13 +90,4 @@ pageData.to_csv(r'C:\Users\Dragonfly\Documents\webPageData.csv',
                 index=False,
                 quotechar='"',
                 header=True,
-                quoting=1)
-#### FOR FUTURE USE
-# # Append data frame with new row
-
-# # Renames column names for readability
-# tocFrame = tocFrame.rename(index=str, columns={0: "headingLevel",
-#                                                1: "headingType",
-#                                                2: 'headingText',
-#                                                3: 'headingDescription',
-#                                                4: 'headingID'})
+                quoting=2)

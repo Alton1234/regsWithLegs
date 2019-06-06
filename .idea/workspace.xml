@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="0cc56692-506c-4f47-961f-4580d5a34275" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CFIARegulations.py" beforeDir="false" afterPath="$PROJECT_DIR$/CFIARegulations.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -12,11 +13,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/CFIARegulations.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="367">
-              <caret line="70" column="53" lean-forward="true" selection-start-line="70" selection-start-column="53" selection-end-line="70" selection-end-column="53" />
+            <state relative-caret-position="375">
+              <caret line="92" column="26" selection-start-line="92" selection-start-column="26" selection-end-line="92" selection-end-column="26" />
               <folding>
                 <element signature="e#1381#1410#0" expanded="true" />
               </folding>
@@ -24,11 +25,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/regsWithLegsFunctions.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="103">
-              <caret line="119" column="48" selection-start-line="119" selection-start-column="48" selection-end-line="119" selection-end-column="48" />
+            <state relative-caret-position="255">
+              <caret line="164" lean-forward="true" selection-start-line="164" selection-end-line="164" />
             </state>
           </provider>
         </entry>
@@ -83,8 +84,8 @@
         <subPane>
           <expand>
             <path>
-              <item name="legsWithRegs" type="b2602c69:ProjectViewProjectNode" />
-              <item name="legsWithRegs" type="462c0819:PsiDirectoryNode" />
+              <item name="CFIA" type="b2602c69:ProjectViewProjectNode" />
+              <item name="CFIA" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -240,7 +241,14 @@
       <option name="project" value="LOCAL" />
       <updated>1559772700663</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Initial working code">
+      <created>1559788793661</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1559788793661</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TodoView">
@@ -253,20 +261,20 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="2576" height="1416" extended-state="6" />
+    <frame x="-7" y="-7" width="1381" height="885" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.09538951" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.1554717" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49801272" visible="true" weight="0.28215122" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49801272" visible="true" weight="0.28174603" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.3998441" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32936507" />
-      <window_info anchor="bottom" id="Version Control" order="7" sideWeight="0.49761525" weight="0.3328137" />
+      <window_info anchor="bottom" id="Version Control" order="7" sideWeight="0.49761525" weight="0.33201057" />
       <window_info anchor="bottom" id="Terminal" order="8" sideWeight="0.5826415" weight="0.5050663" />
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.5019873" side_tool="true" weight="0.28215122" />
       <window_info anchor="bottom" id="Python Console" order="10" sideWeight="0.49962264" weight="0.32936507" />
@@ -287,20 +295,27 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/testCode.py" />
     <entry file="file://$PROJECT_DIR$/pandasTest.py" />
-    <entry file="file://$PROJECT_DIR$/CFIARegulations.py">
+    <entry file="file://$PROJECT_DIR$/venv/Lib/site-packages/pandas/core/indexing.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="367">
-          <caret line="70" column="53" lean-forward="true" selection-start-line="70" selection-start-column="53" selection-end-line="70" selection-end-column="53" />
-          <folding>
-            <element signature="e#1381#1410#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="29500">
+          <caret line="1493" selection-start-line="1493" selection-end-line="1493" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/regsWithLegsFunctions.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="103">
-          <caret line="119" column="48" selection-start-line="119" selection-start-column="48" selection-end-line="119" selection-end-column="48" />
+        <state relative-caret-position="255">
+          <caret line="164" lean-forward="true" selection-start-line="164" selection-end-line="164" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CFIARegulations.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="375">
+          <caret line="92" column="26" selection-start-line="92" selection-start-column="26" selection-end-line="92" selection-end-column="26" />
+          <folding>
+            <element signature="e#1381#1410#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
