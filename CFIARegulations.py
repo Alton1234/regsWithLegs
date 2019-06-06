@@ -40,13 +40,14 @@ headingDict = {
     "h4": 3,
     "h5": 4}
 
-page = requests.get("https://laws-lois.justice.gc.ca/eng/regulations/SOR-2018-108/FullText.html")  # Retrieve regulations html document
+# Retrieve regulations html document
+page = requests.get("https://laws-lois.justice.gc.ca/eng/regulations/SOR-2018-108/FullText.html")
 soup = BeautifulSoup(page.content, 'html.parser')  # Creates beautiful soup objects
 
 # Initializes a pandas data frame for heading data
 titleOfAct = soup.find(class_="Title-of-Act").get_text()
 subText = soup.find(class_='ChapterNumber').get_text()
-tocFrame = pd.DataFrame([[0, "Title of Regulation", titleOfAct, subText, '']])  # Creates first entry
+pageData = pd.DataFrame([[0, "Title of Regulation", titleOfAct, subText, '']])  # Creates first entry
 
 # Drill down to the relevant part of the HTML code
 mainBody = soup.find(id='docCont').find('div')  # returns all elements from the page
@@ -59,27 +60,40 @@ for item in regPart.find_all(recursive=False):
     # Checks if tag is a heading
     if item.name in headingDict:
         varList = udf.proc_heading(item, headingDict[item.name])
+        pageData = pageData.append(udf.clean_data(varList), ignore_index=True)
     # processes classes
     elif len(item.attrs) > 0:
         # Marginal notes, these exist
         if item.get('class')[0] == 'MarginalNote':
             varList = udf.proc_marginalnote(item, 5)
+            pageData = pageData.append(udf.clean_data(varList), ignore_index=True)
         # Retrieves sections
         elif item.get('class')[0] == 'Section':
             varList = udf.proc_section(item, 6)
+            pageData = pageData.append(udf.clean_data(varList), ignore_index=True)
         # Provision lists (contains sections and subsections)
         elif item.get('class')[0] == 'ProvisionList':
-            tempList = udf.proc_provisions(item)
-            print(*tempList, sep = "\n")
+            tempList = udf.proc_provisions(item)  # Returns a list of page elements
+            for i1 in tempList:
+                pageData = pageData.append(udf.clean_data(i1), ignore_index=True)
+            # print(*tempList, sep = "\n")
 
+pageData[2] = pageData[2].astype(str)
+
+pageData = pageData.rename(index=str, columns={0: "headingLevel",
+                                               1: "headingType",
+                                               2: 'headingText',
+                                               3: 'headingDescription',
+                                               4: 'headingID'})
+
+pageData.to_csv(r'C:\Users\Dragonfly\Documents\webPageData.csv',
+                index=False,
+                quotechar='"',
+                header=True,
+                quoting=1)
 #### FOR FUTURE USE
 # # Append data frame with new row
-# tocFrame = tocFrame.append([[headingLevel,
-#                              headingType,
-#                              headingText,
-#                              headingDescription,
-#                              headingID]],
-#                            ignore_index=True)
+
 # # Renames column names for readability
 # tocFrame = tocFrame.rename(index=str, columns={0: "headingLevel",
 #                                                1: "headingType",

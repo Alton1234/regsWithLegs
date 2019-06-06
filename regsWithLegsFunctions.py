@@ -1,3 +1,5 @@
+import pandas as pd
+
 def clean_text(rawtext):
     text = (rawtext.
             replace('\xa0', '').
@@ -5,6 +7,24 @@ def clean_text(rawtext):
             replace('\xe2\x80\x9d', '”').
             replace('\xe2\x80\x94', '-'))
     return text
+
+
+# Processes received lists into a cleaned format for the data table
+def clean_data(dirtyList):
+    # Variable assignment for cleaning
+    headingLevel = dirtyList[0]
+    headingType = dirtyList[1]
+    headingText = str(dirtyList[2])
+    headingDescription = clean_text(dirtyList[3])
+    headingID = dirtyList[4]
+
+    # Data frame creation
+    return pd.DataFrame([[headingLevel,
+                          headingType,
+                          headingText,
+                          headingDescription,
+                          headingID]])
+
 
 def proc_heading(tag, level):
     """Processes headings and returns an array that contains
@@ -15,13 +35,14 @@ def proc_heading(tag, level):
     headingtext = list(tag)[0].get_text()  # Contains the part number etc
 
     if len(list(tag)) > 1:
-        headingdescription = clean_text(list(tag)[1].get_text())  # Contains the description, if any
+        headingdescription = list(tag)[1].get_text()  # Contains the description, if any
     else:
         headingdescription = ''
 
     headingid = tag.get('id')
 
     return [headinglevel, headingtype, headingtext, headingdescription, headingid]
+
 
 def proc_marginalnote(tag, level):
     """Processes marginal notes and returns an array that contains
@@ -35,6 +56,7 @@ def proc_marginalnote(tag, level):
 
     return [headinglevel, headingtype, headingtext, headingdescription, headingid]
 
+
 def proc_section(tag, level):
     """Processes section and returns an array that contains
     the heading level, heading type, heading name, heading text"""
@@ -45,10 +67,11 @@ def proc_section(tag, level):
     headinglevel = level  # Retrieves heading level IE: 1 = part
     headingtype = tag.get('class')[0]
     headingtext = subcode.get_text() # Contains the part number etc
-    headingdescription = clean_text(tempitem.get_text())  # Marginal notes do not have associated descriptions
+    headingdescription = tempitem.get_text()  # Marginal notes do not have associated descriptions
     headingid = subcode.get('id')
 
     return [headinglevel, headingtype, headingtext, headingdescription, headingid]
+
 
 def proc_subsection(tag, subLevel):
     """<p class='subSection'> have one of the following structures:
@@ -80,16 +103,16 @@ def proc_subsection(tag, subLevel):
         subTag = subTag.parent  # Step up to parent
         headingdescription = subTag.find_all(text=True, recursive=False)
         if len(headingdescription) > 1:
-            headingdescription = clean_text(headingdescription[1])
+            headingdescription = headingdescription[1]
         else:
-            headingdescription = clean_text(headingdescription[0])
+            headingdescription = headingdescription[0]
 
         # Generates entry to add too list
         outputlist.append([headinglevel, headingtype, headingtext, headingdescription, headingid])
 
     del outputlist[0]  # Removes first faux entry
-
     return outputlist
+
 
 def proc_paragraph(tag):
     """Processes tags with class paragraph, sub paragraphs, and Clauses"""
@@ -111,14 +134,14 @@ def proc_paragraph(tag):
     headingid = subTag.get('id')
 
     subTag = subTag.parent
-
     headingdescription = subTag.find_all(text=True, recursive=False)
     if len(headingdescription) > 1:
-        headingdescription = clean_text(headingdescription[1])
+        headingdescription = headingdescription[1]
     else:
-        headingdescription = clean_text(headingdescription[0])
+        headingdescription = headingdescription[0]
 
     return [headinglevel, headingtype, headingtext, headingdescription, headingid]
+
 
 def proc_provisions(tag):
     """Processes provisions, this is a recursive function as the depth of these
