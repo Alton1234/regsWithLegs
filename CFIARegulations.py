@@ -51,7 +51,7 @@ headingDict = {
     "h2": 1,
     "h3": 2,
     "h4": 3,
-    "h5": 90}
+    "h5": 4}
 
 # Retrieve regulations html document
 page = requests.get("https://laws-lois.justice.gc.ca/eng/regulations/SOR-2018-108/FullText.html")
@@ -63,12 +63,31 @@ keyFields = OrderedDict([
     ('PART', '0'),
     ('DIVISION', '0'),
     ('SUBDIVISION', '0'),
+    ('SUBDIVISION CONTEXT', '0'),
+    ('SECTION CONTEXT', '0'),
     ('SECTION', '0'),
+    ('SUBSECTION CONTEXT', '0'),
     ('SUBSECTION', '0'),
     ('PARAGRAPH', '0'),
     ('SUBPARAGRAPH', '0'),
     ('CLAUSE', '0')
 ])
+
+# Keeps track of block levels
+blockLevel = {
+    'REGULATION': 0,
+    'PART': 1,
+    'DIVISION': 2,
+    'SUBDIVISION': 3,
+    'SUBDIVISION CONTEXT': 4,
+    'SECTION CONTEXT': 5,
+    'SECTION': 6,
+    'SUBSECTION CONTEXT': 7,
+    'SUBSECTION': 8,
+    'PARAGRAPH': 9,
+    'SUBPARAGRAPH': 10,
+    'CLAUSE': 11
+}
 
 # Initializes a pandas data frame for heading data
 titleOfAct = soup.find(class_="Title-of-Act").get_text()
@@ -82,7 +101,10 @@ pageData = pd.DataFrame([[0,  # Level
                           '0',  # Part
                           '0',  # Division, numeric
                           '0',  # Subdivision, uppercase letter
+                          '0',  # Subdivision context, auto-generated number
+                          '0',  # Section context, auto-generated number
                           '0',  # Section, number
+                          '0',  # Subsection context, auto-generated number
                           '0',  # Subsection, number in brackets (), simplified to show only number
                           '0',  # Paragraph, lower case letter
                           '0',  # Sub paragraph section, roman numeral
@@ -97,13 +119,22 @@ subPart = mainBody.find_all('section', recursive=False)
 intro = subPart[0]  # Stores introduction text
 regPart = subPart[1]  # Stores regulation text
 
+SubdivisionContextCounter = 0
+SectionContextCounter = 0
+subsectionContextCounter = 0
+
 varList = [9999]
 # retrieves body and heading information
 for item in regPart.find_all(recursive=False):
 
-    # Checks if tag is a heading [headingLevel, headingType, headingCode, headingDescription, headingID]
+    # *************** Process Headings ***********************************
     if item.name in headingDict:
-        varList = udf.proc_heading(item, headingDict[item.name])  # Returns cleaned list of data
+        if item.name == 'h5':
+            SubdivisionContextCounter += 1
+
+        varList = udf.proc_heading(item,
+                                   headingDict[item.name],
+                                   SubdivisionContextCounter)  # Returns cleaned list of data
 
         # Processes key values
         if varList[1] in keyFields:
@@ -121,16 +152,22 @@ for item in regPart.find_all(recursive=False):
         # Adds new record to data frame
         pageData = pageData.append(udf.create_dataframe(varList), ignore_index=True)
 
-    # processes classes
+    # *************** Process tag classes ***********************************
     elif len(item.attrs) > 0:
 
-        # Marginal notes, these exist
+        # *************** Process marginal notes - Section context  ***********************************
         if item.get('class')[0] == 'MarginalNote':
-            varList = udf.proc_marginalnote(item, 91)
+            SectionContextCounter += 1
 
-        # Retrieves sections
+            # varList = udf.proc_marginalnote(item,
+            #                                 blockLevel['SUBDIVISION CONTEXT'],
+            #                                 'SECTION CONTEXT',
+            #                                 SectionContextCounter)
+
+        # *************** Process Sections ***********************************
         elif item.get('class')[0] == 'Section':
-            varList = udf.proc_section(item, 4)
+            varList = udf.proc_section(item,
+                                       blockLevel['SECTION'])
 
             # Processes key values
             if varList[1] in keyFields:
@@ -148,11 +185,14 @@ for item in regPart.find_all(recursive=False):
             # Adds new record to data frame
             pageData = pageData.append(udf.create_dataframe(varList), ignore_index=True)
 
-        # Provision lists (contains sections and subsections)
+        # *************** Process provision lists  ***********************************
         elif item.get('class')[0] == 'ProvisionList':
-            tempList = udf.proc_provisions(item)  # Returns a list of page elements
+            tempList = udf.proc_provisions(item, subsectionContextCounter, blockLevel)  # Returns a list of page elements
+
             for varList in tempList:
 
+                if varList[1] == 'SUBSECTION CONTEXT':
+                    subsectionContextCounter = int(varList[2])
                 # Processes key values
                 if varList[1] in keyFields:
                     keyFields[varList[1]] = varList[2]  # Stores coded value
@@ -180,6 +220,9 @@ pageData[9] = pageData[9].astype(str)
 pageData[10] = pageData[10].astype(str)
 pageData[11] = pageData[11].astype(str)
 pageData[12] = pageData[12].astype(str)
+pageData[13] = pageData[13].astype(str)
+pageData[14] = pageData[14].astype(str)
+pageData[15] = pageData[15].astype(str)
 
 
 # Rename pages
@@ -192,11 +235,14 @@ pageData = pageData.rename(index=str, columns={0: "headingLevel",
                                                6: 'PART',
                                                7: 'DIVISION',
                                                8: 'SUBDIVISION',
-                                               9: 'SECTION',
-                                               10: 'SUBSECTION',
-                                               11: 'PARAGRAPH',
-                                               12: 'SUBPARAGRAPH',
-                                               13: 'CLAUSE'})
+                                               9: 'SUBDIVISION CONTEXT',
+                                               10: 'SECTION CONTEXT',
+                                               11: 'SECTION',
+                                               12: 'SUBSECTION CONTEXT',
+                                               13: 'SUBSECTION',
+                                               14: 'PARAGRAPH',
+                                               15: 'SUBPARAGRAPH',
+                                               16: 'CLAUSE'})
 
 #print(pageData)
 pageData.to_csv(r'C:\Users\alton\Documents\webPageData.csv',

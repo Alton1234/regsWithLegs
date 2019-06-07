@@ -75,7 +75,7 @@ def create_dataframe(inputList):
     ]])
 
 
-def proc_heading(tag, level):
+def proc_heading(tag, level, counter):
     """Processes headings and returns an array that contains
     the heading level, heading type, heading name, heading text"""
 
@@ -83,12 +83,16 @@ def proc_heading(tag, level):
         "h2": "Part",
         "h3": "Division",
         "h4": "Subdivision",
-        "h5": "Subdivision category"}
+        "h5": "Subdivision Context"}
 
 
     headinglevel = level # Retrieves heading level IE: 1 = part
     headingtype = headingtype[tag.name]  # Defines the type of variable by the HTML class
-    headingtext = list(tag)[0].get_text()  # Contains the part number etc
+
+    if headingtype == "Subdivision Context":
+        headingtext = str(counter)
+    else:
+        headingtext = list(tag)[0].get_text()  # Contains the part number etc
 
     if len(list(tag)) > 1:
         headingdescription = list(tag)[1].get_text()  # Contains the description, if any
@@ -101,14 +105,14 @@ def proc_heading(tag, level):
     return cleanList
 
 
-def proc_marginalnote(tag, level):
+def proc_marginalnote(tag, level, notetype, counter):
     """Processes marginal notes and returns an array that contains
         the heading level, heading type, heading name, heading text"""
 
     headinglevel = level  # Retrieves heading level IE: 1 = part
-    headingtype = tag.get('class')[0]
-    headingtext = tag.find(text=True, recursive=False)  # Contains the part number etc
-    headingdescription = ''  # Marginal notes do not have associated descriptions
+    headingtype = notetype
+    headingtext = str(counter)  # Contains the part number etc
+    headingdescription = tag.find(text=True, recursive=False)  # Marginal notes do not have associated descriptions
     headingid = tag.get('id')
 
     cleanList = clean_data([headinglevel, headingtype, headingtext, headingdescription, headingid])
@@ -144,7 +148,7 @@ def proc_subsection(tag):
     if len(tag.find_all('strong')) == 1:
         sectiontag = tag.find(class_='sectionLabel')
 
-        headinglevel = 4 # Section
+        headinglevel = 6 # Section
         headingtype = 'section'
         headingtext = sectiontag.get_text()
         headingdescription = ""
@@ -156,7 +160,7 @@ def proc_subsection(tag):
 
     if len(tag.find_all(class_='lawLabel')) > 0:
         subTag = tag.find(class_="lawLabel")
-        headinglevel = 5  # Subsection, this may need to change
+        headinglevel = 8  # Subsection, this may need to change
         headingtype = 'Subsection'
         headingtext = subTag.get_text()
         headingid = subTag.get('id')
@@ -180,9 +184,9 @@ def proc_paragraph(tag):
 
     #Assigns level based on class
     classlevel = {
-        'Paragraph': 6,
-        'Subparagraph': 7,
-        'Clause': 8
+        'Paragraph': 9,
+        'Subparagraph': 10,
+        'Clause': 11
     }
     sublevel = classlevel[tag.get('class')[0]]
     subClass = tag.get('class')[0]
@@ -206,7 +210,7 @@ def proc_paragraph(tag):
     return cleanList
 
 
-def proc_provisions(tag):
+def proc_provisions(tag, counter, blocklevel):
     """Processes provisions, this is a recursive function as the depth of these
     lists are otherwise unknown"""
 
@@ -218,7 +222,11 @@ def proc_provisions(tag):
                 if items.get('class')[0] == 'Subsection':
                     outputlist.extend(proc_subsection(items))
                 elif items.get('class')[0] == 'MarginalNote':
-                    outputlist.append(proc_marginalnote(items, 5))
+                    counter += 1
+                    outputlist.append(proc_marginalnote(items,
+                                                        blocklevel['SUBSECTION CONTEXT'],
+                                                        'SUBSECTION CONTEXT',
+                                                        counter))
                 elif items.get('class')[0] == 'Paragraph':
                     outputlist.append(proc_paragraph(items))
                 elif items.get('class')[0] == 'Subparagraph':
@@ -227,7 +235,7 @@ def proc_provisions(tag):
                     outputlist.append(proc_paragraph(items))
 
             if items.name == 'ul':
-                outputlist.extend(proc_provisions(items))
+                outputlist.extend(proc_provisions(items, counter))
 
     del outputlist[0]  # Removes first faux entry
     return outputlist
