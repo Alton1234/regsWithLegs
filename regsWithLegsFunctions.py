@@ -19,12 +19,60 @@ def clean_data(dirtyList):
     headingDescription = clean_text(dirtyList[3])
     headingID = dirtyList[4]
 
-    # Data frame creation
-    return pd.DataFrame([[headingLevel,
-                          headingType,
-                          headingText,
-                          headingDescription,
-                          headingID]])
+    # **** Variable cleaning ****
+
+    # list heading types and what to parse out
+    replaceString = {
+        "PART ": "",
+        "SECTION ": "",
+        "SUBSECTION ": "",
+        "PARAGRAPH ": "",
+        "SUBPARAGRAPH ": "",
+        "CLAUSE ": "",
+        "DIVISION ": "",
+        "SUBDIVISION ": ""
+    }
+
+    fullTextRemove = ["PART", "SECTION", "DIVISION", "SUBDIVISION"]  # All of the listed text will be removed
+    partialTextRemove = ["SUBSECTION", "PARAGRAPH", "SUBPARAGRAPH", "CLAUSE"]  # Only "(" and ")" will be removed
+
+    headingType = headingType.upper()  # Capitalizes all characters
+
+    # cleans text to leave only code values, in some cases there are no codes and full text will remain
+    if headingType in fullTextRemove:
+        headingText = headingText.replace(headingType, "")
+    elif headingType in partialTextRemove:
+        headingText = headingText.replace("(", "")
+        headingText = headingText.replace(")", "")
+
+    headingText = headingText.strip()  # Remove any leading and trailing whitespace from code values
+
+    # Returns list of cleaned values
+    return [headingLevel,
+            headingType,
+            headingText,
+            headingDescription,
+            headingID]
+
+
+def create_dataframe(inputList):
+    """ Creates a panadas dataframe to append to the master dataset"""
+    return pd.DataFrame([[
+        inputList[0],
+        inputList[1],
+        inputList[2],
+        inputList[3],
+        inputList[4],
+        inputList[5],
+        inputList[6],
+        inputList[7],
+        inputList[8],
+        inputList[9],
+        inputList[10],
+        inputList[11],
+        inputList[12],
+        inputList[13],
+    ]])
 
 
 def proc_heading(tag, level):
@@ -49,7 +97,8 @@ def proc_heading(tag, level):
 
     headingid = tag.get('id')
 
-    return [headinglevel, headingtype, headingtext, headingdescription, headingid]
+    cleanList = clean_data([headinglevel, headingtype, headingtext, headingdescription, headingid])
+    return cleanList
 
 
 def proc_marginalnote(tag, level):
@@ -62,7 +111,8 @@ def proc_marginalnote(tag, level):
     headingdescription = ''  # Marginal notes do not have associated descriptions
     headingid = tag.get('id')
 
-    return [headinglevel, headingtype, headingtext, headingdescription, headingid]
+    cleanList = clean_data([headinglevel, headingtype, headingtext, headingdescription, headingid])
+    return cleanList
 
 
 def proc_section(tag, level):
@@ -78,7 +128,8 @@ def proc_section(tag, level):
     headingdescription = tempitem.get_text()  # Marginal notes do not have associated descriptions
     headingid = subcode.get('id')
 
-    return [headinglevel, headingtype, headingtext, headingdescription, headingid]
+    cleanList = clean_data([headinglevel, headingtype, headingtext, headingdescription, headingid])
+    return cleanList
 
 
 def proc_subsection(tag):
@@ -93,18 +144,19 @@ def proc_subsection(tag):
     if len(tag.find_all('strong')) == 1:
         sectiontag = tag.find(class_='sectionLabel')
 
-        headinglevel = 6 # subSection
+        headinglevel = 4 # Section
         headingtype = 'section'
         headingtext = sectiontag.get_text()
         headingdescription = ""
         headingid = sectiontag.get('id')
 
+        cleanList = clean_data([headinglevel, headingtype, headingtext, headingdescription, headingid])
         # Generates entry to add too list
-        outputlist.append([headinglevel, headingtype, headingtext, headingdescription, headingid])
+        outputlist.append(cleanList)
 
     if len(tag.find_all(class_='lawLabel')) > 0:
         subTag = tag.find(class_="lawLabel")
-        headinglevel = 7  # Subsection, this may need to change
+        headinglevel = 5  # Subsection, this may need to change
         headingtype = 'Subsection'
         headingtext = subTag.get_text()
         headingid = subTag.get('id')
@@ -116,7 +168,8 @@ def proc_subsection(tag):
             headingdescription = headingdescription[0]
 
         # Generates entry to add too list
-        outputlist.append([headinglevel, headingtype, headingtext, headingdescription, headingid])
+        cleanList = clean_data([headinglevel, headingtype, headingtext, headingdescription, headingid])
+        outputlist.append(cleanList)
 
     del outputlist[0]  # Removes first faux entry
     return outputlist
@@ -127,9 +180,9 @@ def proc_paragraph(tag):
 
     #Assigns level based on class
     classlevel = {
-        'Paragraph': 7,
-        'Subparagraph': 8,
-        'Clause': 9
+        'Paragraph': 6,
+        'Subparagraph': 7,
+        'Clause': 8
     }
     sublevel = classlevel[tag.get('class')[0]]
     subClass = tag.get('class')[0]
@@ -149,7 +202,8 @@ def proc_paragraph(tag):
     else:
         headingdescription = headingdescription[0]
 
-    return [headinglevel, headingtype, headingtext, headingdescription, headingid]
+    cleanList = clean_data([headinglevel, headingtype, headingtext, headingdescription, headingid])
+    return cleanList
 
 
 def proc_provisions(tag):
