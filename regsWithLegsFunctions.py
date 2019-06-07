@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 def clean_text(rawtext):
     text = (rawtext.
             replace('\xa0', '').
@@ -30,8 +31,15 @@ def proc_heading(tag, level):
     """Processes headings and returns an array that contains
     the heading level, heading type, heading name, heading text"""
 
+    headingtype = {
+        "h2": "Part",
+        "h3": "Division",
+        "h4": "Subdivision",
+        "h5": "Subdivision category"}
+
+
     headinglevel = level # Retrieves heading level IE: 1 = part
-    headingtype = list(tag.get('class'))[0]  # Defines the type of variable by the HTML class
+    headingtype = headingtype[tag.name]  # Defines the type of variable by the HTML class
     headingtext = list(tag)[0].get_text()  # Contains the part number etc
 
     if len(list(tag)) > 1:
@@ -73,7 +81,7 @@ def proc_section(tag, level):
     return [headinglevel, headingtype, headingtext, headingdescription, headingid]
 
 
-def proc_subsection(tag, subLevel):
+def proc_subsection(tag):
     """<p class='subSection'> have one of the following structures:
     1. SECTION(SUB SECTION) or
     2. (SUB SECTION)
@@ -86,7 +94,7 @@ def proc_subsection(tag, subLevel):
         sectiontag = tag.find(class_='sectionLabel')
 
         headinglevel = 6 # subSection
-        headingtype = 'sectionLabel'
+        headingtype = 'section'
         headingtext = sectiontag.get_text()
         headingdescription = ""
         headingid = sectiontag.get('id')
@@ -96,8 +104,8 @@ def proc_subsection(tag, subLevel):
 
     if len(tag.find_all(class_='lawLabel')) > 0:
         subTag = tag.find(class_="lawLabel")
-        headinglevel = subLevel  # Subsection, this may need to change
-        headingtype = 'lawLabel'
+        headinglevel = 7  # Subsection, this may need to change
+        headingtype = 'Subsection'
         headingtext = subTag.get_text()
         headingid = subTag.get('id')
         subTag = subTag.parent  # Step up to parent
@@ -124,12 +132,13 @@ def proc_paragraph(tag):
         'Clause': 9
     }
     sublevel = classlevel[tag.get('class')[0]]
+    subClass = tag.get('class')[0]
 
-    #S1: retrieve lawLable object
+    # S1: retrieve lawLable object
     subTag = tag.find(class_="lawLabel")
 
     headinglevel = sublevel
-    headingtype = 'lawLabel'
+    headingtype = subClass
     headingtext = subTag.get_text()  # Contains the part number etc
     headingid = subTag.get('id')
 
@@ -153,7 +162,7 @@ def proc_provisions(tag):
             # S2: There should only be <p> and <ul> at this point, in the case of <p> scrape contents
             if items.name == 'p':
                 if items.get('class')[0] == 'Subsection':
-                    outputlist.extend(proc_subsection(items, 7))
+                    outputlist.extend(proc_subsection(items))
                 elif items.get('class')[0] == 'MarginalNote':
                     outputlist.append(proc_marginalnote(items, 5))
                 elif items.get('class')[0] == 'Paragraph':

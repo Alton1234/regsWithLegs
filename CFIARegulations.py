@@ -47,7 +47,22 @@ soup = BeautifulSoup(page.content, 'html.parser')  # Creates beautiful soup obje
 # Initializes a pandas data frame for heading data
 titleOfAct = soup.find(class_="Title-of-Act").get_text()
 subText = soup.find(class_='ChapterNumber').get_text()
-pageData = pd.DataFrame([[0, "Title of Regulation", titleOfAct, subText, '']])  # Creates first entry
+pageData = pd.DataFrame([[0,  # Level
+                          "Title-of-Act",  # html class
+                          titleOfAct,  # Text/number of heading or section
+                          subText,  # Description of heading/caption or section contents
+                          '' #,  # HTML id tag, if any
+                          # '1',  # Indicates if entry is a heading
+                          # '1',  # Regulation
+                          # '0',  # Part
+                          # '0',  # Division, numeric
+                          # '0',  # Subdivision, letter
+                          # '0',  # Section, number
+                          # '0',  # Subsection, number in brackets (), simplified to show only number
+                          # '0',  # Sub-sub section, lower case letter
+                          # '0',  # sub-sub-sub section, roman numeral
+                          # '0'   # sub-sub-sub-sub section, upper case letter
+                          ]])  # Creates first entry
 
 # Drill down to the relevant part of the HTML code
 mainBody = soup.find(id='docCont').find('div')  # returns all elements from the page
@@ -56,6 +71,7 @@ subPart = mainBody.find_all('section', recursive=False)
 intro = subPart[0]  # Stores introduction text
 regPart = subPart[1]  # Stores regulation text
 
+# retrieves body and heading information
 for item in regPart.find_all(recursive=False):
     # Checks if tag is a heading
     if item.name in headingDict:
@@ -86,8 +102,9 @@ pageData = pageData.rename(index=str, columns={0: "headingLevel",
                                                3: 'headingDescription',
                                                4: 'headingID'})
 
+#print(pageData)
 pageData.to_csv(r'C:\Users\Dragonfly\Documents\webPageData.csv',
-                index=False,
+                index=True,
                 quotechar='"',
                 header=True,
                 quoting=2)
