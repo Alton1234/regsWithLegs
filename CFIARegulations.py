@@ -57,6 +57,12 @@ headingDict = {
 page = requests.get("https://laws-lois.justice.gc.ca/eng/regulations/SOR-2018-108/FullText.html")
 soup = BeautifulSoup(page.content, 'html.parser')  # Creates beautiful soup objects
 
+# Drill down to the relevant part of the HTML code
+mainBody = soup.find(id='docCont').find('div')  # returns all elements from the page
+subPart = mainBody.find_all('section', recursive=False)
+intro = subPart[0]  # Stores introduction text
+regPart = subPart[1]  # Stores regulation text
+
 # Key value initial assignment
 keyFields = OrderedDict([
     ('REGULATION', 'SOR/2018-108'),
@@ -111,13 +117,6 @@ pageData = pd.DataFrame([[0,  # Level
                           '0'   # clause section, upper case letter
                           ]]
                         )
-
-# Drill down to the relevant part of the HTML code
-mainBody = soup.find(id='docCont').find('div')  # returns all elements from the page
-subPart = mainBody.find_all('section', recursive=False)
-
-intro = subPart[0]  # Stores introduction text
-regPart = subPart[1]  # Stores regulation text
 
 SubdivisionContextCounter = 0
 SectionContextCounter = 0

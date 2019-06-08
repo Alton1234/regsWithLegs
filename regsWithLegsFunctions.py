@@ -78,8 +78,14 @@ def create_dataframe(inputList):
     ]])
 
 
-def proc_descrition(tag):
-    t=1
+def proc_description(tag):
+    """Cleans the descriptions out of the element and avoids HREF etc"""
+    description = ""
+    for string in tag.strings:
+        if string.parent != 'span' and string.strip() != "":
+            description = description + string
+
+    return description
 
 
 def proc_heading(tag, level, counter):
@@ -123,7 +129,7 @@ def proc_marginalnote(tag, level, notetype, counter):
     headinglevel = level  # Retrieves heading level IE: 1 = part
     headingtype = notetype
     headingtext = str(counter)  # Contains the part number etc
-    headingdescription = tag.find(text=True, recursive=False)  # Marginal notes do not have associated descriptions
+    headingdescription = ""  # Marginal notes do not have associated descriptions
     headingid = tag.get('id')
 
     cleanList = clean_data([headinglevel, headingtype, headingtext, headingdescription, headingid])
@@ -139,8 +145,9 @@ def proc_section(tag, level):
 
     headinglevel = level  # Retrieves heading level IE: 1 = part
     headingtype = tag.get('class')[0]
-    headingtext = subcode.get_text() # Contains the part number etc
-    headingdescription = tempitem.get_text()  # Marginal notes do not have associated descriptions
+    headingtext = subcode.get_text()  # Contains the part number etc
+    headingdescription = tempitem.get_text()
+
     headingid = subcode.get('id')
 
     cleanList = clean_data([headinglevel, headingtype, headingtext, headingdescription, headingid])
