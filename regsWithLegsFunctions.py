@@ -72,7 +72,14 @@ def create_dataframe(inputList):
         inputList[11],
         inputList[12],
         inputList[13],
+        inputList[14],
+        inputList[15],
+        inputList[16],
     ]])
+
+
+def proc_descrition(tag):
+    t=1
 
 
 def proc_heading(tag, level, counter):
@@ -94,7 +101,11 @@ def proc_heading(tag, level, counter):
     else:
         headingtext = list(tag)[0].get_text()  # Contains the part number etc
 
-    if len(list(tag)) > 1:
+    if len(list(tag)) > 0:
+        tempstring = ""
+        for subtext in tag:
+            if subtext.get('class') != 'lawLabel':
+                tempstring = tempstring + subtext.get_text()
         headingdescription = list(tag)[1].get_text()  # Contains the description, if any
     else:
         headingdescription = ''
@@ -210,7 +221,7 @@ def proc_paragraph(tag):
     return cleanList
 
 
-def proc_provisions(tag, counter, blocklevel):
+def proc_provisions(tag, counter):
     """Processes provisions, this is a recursive function as the depth of these
     lists are otherwise unknown"""
 
@@ -224,7 +235,7 @@ def proc_provisions(tag, counter, blocklevel):
                 elif items.get('class')[0] == 'MarginalNote':
                     counter += 1
                     outputlist.append(proc_marginalnote(items,
-                                                        blocklevel['SUBSECTION CONTEXT'],
+                                                        7,
                                                         'SUBSECTION CONTEXT',
                                                         counter))
                 elif items.get('class')[0] == 'Paragraph':

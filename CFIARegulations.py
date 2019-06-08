@@ -187,7 +187,7 @@ for item in regPart.find_all(recursive=False):
 
         # *************** Process provision lists  ***********************************
         elif item.get('class')[0] == 'ProvisionList':
-            tempList = udf.proc_provisions(item, subsectionContextCounter, blockLevel)  # Returns a list of page elements
+            tempList = udf.proc_provisions(item, subsectionContextCounter)  # Returns a list of page elements
 
             for varList in tempList:
 
@@ -244,8 +244,9 @@ pageData = pageData.rename(index=str, columns={0: "headingLevel",
                                                15: 'SUBPARAGRAPH',
                                                16: 'CLAUSE'})
 
-#print(pageData)
-pageData.to_csv(r'C:\Users\alton\Documents\webPageData.csv',
+# print(pageData)
+# C:\Users\alton\Documents\webPageData.csv
+pageData.to_csv(r'C:\Users\Dragonfly\Documents\webPageData.csv',
                 index=True,
                 quotechar='"',
                 header=True,
