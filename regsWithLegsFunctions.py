@@ -82,8 +82,9 @@ def proc_description(tag):
     """Cleans the descriptions out of the element and avoids HREF etc"""
     description = ""
     for string in tag.strings:
-        if string.parent != 'span' and string.strip() != "":
-            description = description + string
+        if string.parent.name != 'span':
+            if string.strip() != "":
+                description = description + string
 
     return description
 
@@ -101,20 +102,24 @@ def proc_heading(tag, level, counter):
 
     headinglevel = level # Retrieves heading level IE: 1 = part
     headingtype = headingtype[tag.name]  # Defines the type of variable by the HTML class
+    headingdescription = ""  # Starting value for heading description
 
     if headingtype == "Subdivision Context":
         headingtext = str(counter)
     else:
         headingtext = list(tag)[0].get_text()  # Contains the part number etc
 
-    if len(list(tag)) > 0:
-        tempstring = ""
-        for subtext in tag:
-            if subtext.get('class') != 'lawLabel':
-                tempstring = tempstring + subtext.get_text()
-        headingdescription = list(tag)[1].get_text()  # Contains the description, if any
-    else:
-        headingdescription = ''
+    if headingtype == "Subdivision Context":
+        headingdescription = list(tag.children)[0].string
+    elif len(list(tag)) == 2:
+        headingdescription = list(tag.children)[1].string
+    elif len(list(tag)) > 2:
+        i = 0  # counter for the following logic
+        for string in tag.children.strings:
+            if i == 0:
+                i += 1
+            else:
+                headingdescription = headingdescription + string
 
     headingid = tag.get('id')
 
@@ -129,9 +134,16 @@ def proc_marginalnote(tag, level, notetype, counter):
     headinglevel = level  # Retrieves heading level IE: 1 = part
     headingtype = notetype
     headingtext = str(counter)  # Contains the part number etc
-    headingdescription = ""  # Marginal notes do not have associated descriptions
-    headingid = tag.get('id')
 
+    headingdescription = ""
+    i = 0
+    for string in tag.strings:
+        if i == 0:
+            i += 1
+        else:
+            headingdescription = headingdescription + string
+
+    headingid = tag.get('id')
     cleanList = clean_data([headinglevel, headingtype, headingtext, headingdescription, headingid])
     return cleanList
 
@@ -146,7 +158,7 @@ def proc_section(tag, level):
     headinglevel = level  # Retrieves heading level IE: 1 = part
     headingtype = tag.get('class')[0]
     headingtext = subcode.get_text()  # Contains the part number etc
-    headingdescription = tempitem.get_text()
+    headingdescription = proc_description(tag)
 
     headingid = subcode.get('id')
 
@@ -183,11 +195,7 @@ def proc_subsection(tag):
         headingtext = subTag.get_text()
         headingid = subTag.get('id')
         subTag = subTag.parent  # Step up to parent
-        headingdescription = subTag.find_all(text=True, recursive=False)
-        if len(headingdescription) > 1:
-            headingdescription = headingdescription[1]
-        else:
-            headingdescription = headingdescription[0]
+        headingdescription = proc_description(tag)
 
         # Generates entry to add too list
         cleanList = clean_data([headinglevel, headingtype, headingtext, headingdescription, headingid])
@@ -218,11 +226,7 @@ def proc_paragraph(tag):
     headingid = subTag.get('id')
 
     subTag = subTag.parent
-    headingdescription = subTag.find_all(text=True, recursive=False)
-    if len(headingdescription) > 1:
-        headingdescription = headingdescription[1]
-    else:
-        headingdescription = headingdescription[0]
+    headingdescription = proc_description(tag)
 
     cleanList = clean_data([headinglevel, headingtype, headingtext, headingdescription, headingid])
     return cleanList

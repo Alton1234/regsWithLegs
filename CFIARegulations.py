@@ -54,8 +54,19 @@ headingDict = {
     "h5": 4}
 
 # Retrieve regulations html document
+# Safe food for Canadians regulations
 page = requests.get("https://laws-lois.justice.gc.ca/eng/regulations/SOR-2018-108/FullText.html")
-soup = BeautifulSoup(page.content, 'html.parser')  # Creates beautiful soup objects
+
+# Food and drug regulations
+# page = requests.get('https://laws.justice.gc.ca/eng/regulations/c.r.c.,_c._870/FullText.html')
+
+# Migratory birds regulations
+# page = requests.get('https://laws-lois.justice.gc.ca/eng/regulations/C.R.C.,_c._1035/FullText.html')
+
+# Yellowknife Airport zoning regulations *** This doesn't seem to work quite as well, there is loss ***
+#page = requests.get('https://laws-lois.justice.gc.ca/eng/regulations/SOR-81-472/FullText.html')
+
+soup = BeautifulSoup(page.content, 'lxml')  # Creates beautiful soup objects
 
 # Drill down to the relevant part of the HTML code
 mainBody = soup.find(id='docCont').find('div')  # returns all elements from the page
@@ -158,15 +169,30 @@ for item in regPart.find_all(recursive=False):
         if item.get('class')[0] == 'MarginalNote':
             SectionContextCounter += 1
 
-            # varList = udf.proc_marginalnote(item,
-            #                                 blockLevel['SUBDIVISION CONTEXT'],
-            #                                 'SECTION CONTEXT',
-            #                                 SectionContextCounter)
+            varList = udf.proc_marginalnote(item,
+                                             blockLevel['SECTION CONTEXT'],
+                                             'SECTION CONTEXT',
+                                             SectionContextCounter)
+
+            # Processes key values
+            if varList[1] in keyFields:
+                keyFields[varList[1]] = varList[2]  # Stores coded value
+
+                # Reset all codes after the level of the heading
+                for i, (key, value) in enumerate(keyFields.items()):
+                    if i > varList[0]:
+                        keyFields[key] = '0'
+
+            # Add key values to list
+            for i, (key, value) in enumerate(keyFields.items()):
+                varList.append(value)
+
+            # Adds new record to data frame
+            pageData = pageData.append(udf.create_dataframe(varList), ignore_index=True)
 
         # *************** Process Sections ***********************************
         elif item.get('class')[0] == 'Section':
-            varList = udf.proc_section(item,
-                                       blockLevel['SECTION'])
+            varList = udf.proc_section(item, blockLevel['SECTION'])
 
             # Processes key values
             if varList[1] in keyFields:
@@ -210,18 +236,8 @@ for item in regPart.find_all(recursive=False):
 
 
 # Force string format on code field
-pageData[2] = pageData[2].astype(str)
-pageData[5] = pageData[5].astype(str)
-pageData[6] = pageData[6].astype(str)
-pageData[7] = pageData[7].astype(str)
-pageData[8] = pageData[8].astype(str)
-pageData[9] = pageData[9].astype(str)
-pageData[10] = pageData[10].astype(str)
-pageData[11] = pageData[11].astype(str)
-pageData[12] = pageData[12].astype(str)
-pageData[13] = pageData[13].astype(str)
-pageData[14] = pageData[14].astype(str)
-pageData[15] = pageData[15].astype(str)
+for i in range(16):
+    pageData[i] = pageData[i].astype(str)
 
 
 # Rename pages
@@ -245,7 +261,8 @@ pageData = pageData.rename(index=str, columns={0: "headingLevel",
 
 # print(pageData)
 # C:\Users\alton\Documents\webPageData.csv
-pageData.to_csv(r'C:\Users\Dragonfly\Documents\webPageData.csv',
+# C:\Users\Dragonfly\Documents\webPageData.csv
+pageData.to_csv(r'C:\Users\alton\Documents\webPageData.csv',
                 index=True,
                 quotechar='"',
                 header=True,
