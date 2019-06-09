@@ -129,6 +129,33 @@ pageData = pd.DataFrame([[0,  # Level
                           ]]
                         )
 
+
+# *********** Definitions ********************************
+# Retrieves a list of terms and definitions from the regulations.
+# These aren't "smart" for now and won't do a very good job at preserving format, however
+# The text should be there
+
+definitions = pd.DataFrame([["I am a term", "I am a definition"]])  # initial data frame
+for item in soup.find_all('dd'):
+    definition = ""
+    for string in item.strings:
+        if string.parent.name == 'dfn':
+            if string.strip() == ")":
+                term = "98765"
+            else:
+                term = string
+        else:
+            definition = definition + string
+    if term == "98765":
+        tempDF = pd.DataFrame([[term, definition]])
+    else:
+        tempDF = pd.DataFrame([[term, term + definition]])
+
+    definitions = definitions.append(tempDF, ignore_index=True)
+
+definitions = definitions.rename(index=str, columns={0: "Term", 1: "Definition"})
+
+# ************ Process regulation bits and pieces *****************
 SubdivisionContextCounter = 0
 SectionContextCounter = 0
 subsectionContextCounter = 0
@@ -262,7 +289,13 @@ pageData = pageData.rename(index=str, columns={0: "headingLevel",
 # print(pageData)
 # C:\Users\alton\Documents\webPageData.csv
 # C:\Users\Dragonfly\Documents\webPageData.csv
-pageData.to_csv(r'C:\Users\alton\Documents\webPageData.csv',
+pageData.to_csv(r'C:\Users\Dragonfly\Documents\webPageData.csv',
+                index=True,
+                quotechar='"',
+                header=True,
+                quoting=2)
+
+definitions.to_csv(r'C:\Users\Dragonfly\Documents\definitions.csv',
                 index=True,
                 quotechar='"',
                 header=True,
