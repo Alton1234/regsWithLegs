@@ -56,9 +56,11 @@ headingDict = {
 # Retrieve regulations html document
 # Safe food for Canadians regulations
 # page = requests.get("https://laws-lois.justice.gc.ca/eng/regulations/SOR-2018-108/FullText.html")
+# regulationID = 'SOR/2018-108'
 
 # Food and drug regulations
 page = requests.get('https://laws.justice.gc.ca/eng/regulations/c.r.c.,_c._870/FullText.html')
+regulationID = 'C.R.C., c. 870'  # Food and drug regulations
 
 # Migratory birds regulations
 # page = requests.get('https://laws-lois.justice.gc.ca/eng/regulations/C.R.C.,_c._1035/FullText.html')
@@ -76,7 +78,7 @@ regPart = subPart[1]  # Stores regulation text
 
 # Key value initial assignment
 keyFields = OrderedDict([
-    ('REGULATION', 'SOR/2018-108'),
+    ('REGULATION', regulationID),
     ('PART', '0'),
     ('DIVISION', '0'),
     ('SUBDIVISION', '0'),
@@ -108,8 +110,6 @@ blockLevel = {
 
 # Initializes a pandas data frame for heading data
 titleOfAct = soup.find(class_="Title-of-Act").get_text()
-regulationID = 'C.R.C., c. 870'  # Food and drug regulations
-# regulationID = 'SOR/2018-108'
 subText = soup.find(class_='ChapterNumber').get_text()
 pageData = pd.DataFrame([[0,  # Level
                           "Regulation",  # Type of regulation block
@@ -291,15 +291,18 @@ pageData = pageData.rename(index=str, columns={0: "headingLevel",
 # print(pageData)
 # C:\Users\alton\Documents\webPageData.csv
 # C:\Users\Dragonfly\Documents\webPageData.csv
-pageData.to_csv(r'C:\Users\Dragonfly\Documents\webPageData.csv',
+# sfcr.tsv
+# fdr.tsv
+pageData.to_csv(r'C:\Users\Dragonfly\Documents\fdr.tsv',
                 index=False,
                 sep='\t',
                 quotechar='"',
                 header=True,
                 quoting=1)
 
-definitions.to_csv(r'C:\Users\Dragonfly\Documents\definitions.csv',
-                index=False,
-                quotechar='"',
-                header=True,
-                quoting=1)
+definitions.to_csv(r'C:\Users\Dragonfly\Documents\fdr_definitions.csv',
+                   index=False,
+                   sep='\t',
+                   quotechar='"',
+                   header=True,
+                   quoting=1)
