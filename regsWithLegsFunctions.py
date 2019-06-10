@@ -1,6 +1,5 @@
 import pandas as pd
 
-
 def clean_text(rawtext):
     text = (rawtext.
             replace('\xa0', '').

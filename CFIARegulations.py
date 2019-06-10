@@ -55,10 +55,10 @@ headingDict = {
 
 # Retrieve regulations html document
 # Safe food for Canadians regulations
-page = requests.get("https://laws-lois.justice.gc.ca/eng/regulations/SOR-2018-108/FullText.html")
+# page = requests.get("https://laws-lois.justice.gc.ca/eng/regulations/SOR-2018-108/FullText.html")
 
 # Food and drug regulations
-# page = requests.get('https://laws.justice.gc.ca/eng/regulations/c.r.c.,_c._870/FullText.html')
+page = requests.get('https://laws.justice.gc.ca/eng/regulations/c.r.c.,_c._870/FullText.html')
 
 # Migratory birds regulations
 # page = requests.get('https://laws-lois.justice.gc.ca/eng/regulations/C.R.C.,_c._1035/FullText.html')
@@ -108,13 +108,15 @@ blockLevel = {
 
 # Initializes a pandas data frame for heading data
 titleOfAct = soup.find(class_="Title-of-Act").get_text()
+regulationID = 'C.R.C., c. 870'  # Food and drug regulations
+# regulationID = 'SOR/2018-108'
 subText = soup.find(class_='ChapterNumber').get_text()
 pageData = pd.DataFrame([[0,  # Level
                           "Regulation",  # Type of regulation block
-                          'SOR/2018-108',  # Text/number of heading or section
+                          regulationID,  # Text/number of heading or section
                           titleOfAct,  # Description of heading/caption or section contents
                           '',  # HTML id tag, if any
-                          'SOR/2018-108',  # Regulation
+                          regulationID,  # Regulation
                           '0',  # Part
                           '0',  # Division, numeric
                           '0',  # Subdivision, uppercase letter
@@ -128,7 +130,6 @@ pageData = pd.DataFrame([[0,  # Level
                           '0'   # clause section, upper case letter
                           ]]
                         )
-
 
 # *********** Definitions ********************************
 # Retrieves a list of terms and definitions from the regulations.
@@ -286,17 +287,19 @@ pageData = pageData.rename(index=str, columns={0: "headingLevel",
                                                15: 'SUBPARAGRAPH',
                                                16: 'CLAUSE'})
 
+
 # print(pageData)
 # C:\Users\alton\Documents\webPageData.csv
 # C:\Users\Dragonfly\Documents\webPageData.csv
 pageData.to_csv(r'C:\Users\Dragonfly\Documents\webPageData.csv',
-                index=True,
+                index=False,
+                sep='\t',
                 quotechar='"',
                 header=True,
-                quoting=2)
+                quoting=1)
 
 definitions.to_csv(r'C:\Users\Dragonfly\Documents\definitions.csv',
-                index=True,
+                index=False,
                 quotechar='"',
                 header=True,
-                quoting=2)
+                quoting=1)
